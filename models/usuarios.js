@@ -35,6 +35,19 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    estado: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: 0
+    },
+    url_validacion: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    codigo_sesion: {
+      type: DataTypes.CHAR(6),
+      allowNull: true
     }
   }, {
     sequelize,

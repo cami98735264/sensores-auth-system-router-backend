@@ -13,11 +13,22 @@ const login = async (req, res) => {
     if(!req.foundUser) {
         return res.status(400).json({ message: "No existe un usuario con ese email", success: false });
     }
+    if(req.foundUser.estado === false) {
+        return res.status(400).json({ message: "Por favor verifica tu cuenta", success: false });
+    }
+    if(!req.foundUser.codigo_sesion) {
+        return res.status(400).json({ message: "Por favor, genera un código de inicio de sesión e ingresalo, luego podrás iniciar sesión", success: false });
+    }
     try {
         const match = bcrypt.compareSync(password, req.foundUser.contraseña);
         if(!match) {
             return res.status(400).json({ message: "La contraseña no es correcta", success: false });
         }
+        if(req.foundUser.codigo_sesion !== req.body.code) {
+            return res.status(400).json({ message: "El código de inicio de sesión no es correcto", success: false });
+        }
+        // Update the user's code to null
+        await req.foundUser.update({ codigo_sesion: null });
         const payload = { id: req.foundUser.id_usuario, email: req.foundUser.email, names: req.foundUser.nombres, lastname: req.foundUser.primer_apellido, second_lastname: req.foundUser.segundo_apellido, telefono: req.foundUser.telefono };
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
         // Set cookie to max age 1 hour
